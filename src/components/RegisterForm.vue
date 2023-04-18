@@ -8,7 +8,7 @@
             <label class="inline-block mb-2">Name</label>
             <vee-field type="text" name="name"
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition
-                                                                                                                                    duration-500 focus:outline-none focus:border-black rounded"
+                                                                                                                                                                        duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Enter Name" />
             <ErrorMessage class="text-red-600" name="name" />
         </div>
@@ -17,7 +17,7 @@
             <label class="inline-block mb-2">Email</label>
             <vee-field type="email" name="email"
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition
-                                                                                                         duration-500 focus:outline-none focus:border-black rounded"
+                                                                                                                                             duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Enter Email" />
             <ErrorMessage class="text-red-600" name="email" />
         </div>
@@ -26,17 +26,18 @@
             <label class="inline-block mb-2">Age</label>
             <vee-field type="number" name="age"
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition
-                                                                                                           duration-500 focus:outline-none focus:border-black rounded" />
+                                                                                                                                               duration-500 focus:outline-none focus:border-black rounded" />
             <ErrorMessage class="text-red-600" name="age" />
         </div>
         <!-- Password -->
         <div class="mb-2">
             <label class="inline-block mb-2">Password</label>
             <vee-field name="password" :bails="false" v-slot="{ field, errors }">
-                <input type="password" class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition
-                                                                duration-500 focus:outline-none 
-                                                                focus:border-black rounded" placeholder="Password"
-                    v-bind="field" />
+                <input type="password"
+                    class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition
+                                                                                                    duration-500 focus:outline-none 
+                                                                                                    focus:border-black rounded"
+                    placeholder="Password" v-bind="field" />
                 <div class="text-red-600" v-for="error in errors" :key="error">
                     {{ error }}
                 </div>
@@ -47,7 +48,7 @@
             <label class="inline-block mb-2">Confirm Password</label>
             <vee-field type="password" name="confirm_password"
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition
-                                                                                                                                                                                                                                                                                                duration-500 focus:outline-none focus:border-black rounded"
+                                                                                                                                                                                                                                                                                                                                    duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Confirm Password" />
             <ErrorMessage class="text-red-600" name="confirm_password" />
         </div>
@@ -56,7 +57,7 @@
             <label class="inline-block mb-2">Country</label>
             <vee-field as="select" name="country"
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition
-                                                                                       duration-500 focus:outline-none focus:border-black rounded">
+                                                                                                                           duration-500 focus:outline-none focus:border-black rounded">
                 <option value="USA">USA</option>
                 <option value="Mexico">Mexico</option>
                 <option value="Germany">Germany</option>
@@ -72,7 +73,7 @@
         </div>
         <button type="submit" :disabled="reg_in_submittion"
             class="block w-full bg-purple-600 text-white py-1.5 px-3 rounded transition
-                                                                                                                                                                                                                                                                                              hover:bg-purple-700">
+                                                                                                                                                                                                                                                                                                                                  hover:bg-purple-700">
             Submit
         </button>
     </vee-form>
@@ -80,6 +81,7 @@
 
 <script>
 import { ErrorMessage } from 'vee-validate';
+import firebase from '@/includes/firebase'
 export default {
     name: "RegisterForm",
     data() {
@@ -104,15 +106,26 @@ export default {
         };
     },
     methods: {
-        register(values) {
+        async register(values) {
             this.reg_show_alert = true;
             this.reg_in_submittion = true;
             this.reg_alert_variant = 'bg-blue-500';
             this.reg_alert_msg = 'Please wait! Your account is being created.';
+            let userCred = null;
+            try {
+                userCred = firebase.auth().createUserWithEmailPassword(
+                    values.email, values.password
+                )
+            } catch (error) {
+                this.reg_in_submittion = false;
+                this.reg_alert_variant = 'bg-red-500';
+                this.reg_alert_msg = 'An unxpected error occured. Please try again late.r'
+                return;
+            }
 
             this.reg_alert_variant = 'bg-green-500';
             this.reg_alert_msg = 'Success! Your account has been created.';
-            console.log(values);
+            console.log(userCred);
         }
     },
     components: { ErrorMessage }
