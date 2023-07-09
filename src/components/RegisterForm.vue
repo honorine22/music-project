@@ -80,8 +80,8 @@
 </template>
 
 <script>
+import { auth, usersCollection } from '@/includes/firebase';
 import { ErrorMessage } from 'vee-validate';
-import firebase from '@/includes/firebase'
 export default {
     name: "RegisterForm",
     data() {
@@ -111,21 +111,22 @@ export default {
             this.reg_in_submittion = true;
             this.reg_alert_variant = 'bg-blue-500';
             this.reg_alert_msg = 'Please wait! Your account is being created.';
-            let userCred = null;
             try {
-                userCred = firebase.auth().createUserWithEmailPassword(
-                    values.email, values.password
-                )
+                await this.$store.dispatch('register', values);
             } catch (error) {
+                console.log('====================================');
+                console.log(error);
+                console.log('====================================');
                 this.reg_in_submittion = false;
                 this.reg_alert_variant = 'bg-red-500';
-                this.reg_alert_msg = 'An unxpected error occured. Please try again late.r'
+                this.reg_alert_msg = 'An unxpected error occured. Please try again later'
+                // Stop a function for further execution
                 return;
             }
 
             this.reg_alert_variant = 'bg-green-500';
             this.reg_alert_msg = 'Success! Your account has been created.';
-            console.log(userCred);
+            window.location.reload();
         }
     },
     components: { ErrorMessage }
